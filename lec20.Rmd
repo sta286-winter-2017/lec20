@@ -1,0 +1,202 @@
+---
+title: "STA286 Lecture 20"
+author: "Neil Montgomery"
+date: "Last edited: `r format(Sys.time(), '%Y-%m-%d %H:%M')`"
+output: 
+  beamer_presentation:
+    keep_tex: TRUE
+    incremental: TRUE
+    df_print: tibble
+    fig_caption: FALSE
+classoption: aspectratio=169
+header-includes:
+- \renewcommand{\le}{\leqslant}
+- \renewcommand{\ge}{\geqslant}
+- \renewcommand\P[1]{P{\left(#1\right)}}
+- \newcommand\F[1]{F_{\tiny{#1}}}
+- \newcommand\f[1]{f_{\tiny{#1}}}
+- \newcommand\p[1]{p_{\tiny{#1}}}
+- \newcommand\M[1]{M_{\tiny{#1}}}
+- \newcommand\V[1]{\text{Var}\!\left(#1\right)}
+- \newcommand\E[1]{E\!\left(#1\right)}
+- \newcommand\N[1]{N_{\tiny{#1}}}
+- \newcommand\ol{\overline}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE, message=FALSE)
+options(tibble.width=70)
+```
+
+## basic result for $\ol{X}$ in general
+
+For a sample $X_1,\ldots,X_n$ i.i.d. from \textit{any} distribution with mean $\mu$ and variance $\sigma^2$, the following are always true:
+
+\begin{align*}
+\E{\ol{X}} \onslide<+->{&= \E{\frac{1}{n}\sum\limits_{i=1}^n X_i}} \onslide<+->{= \frac{1}{n}\sum\limits_{i=1}^n \E{X_i}} \onslide<+->{=\frac{1}{n}n\mu=\mu}\\
+\V{\ol{X}} &= \V{\frac{1}{n}\sum\limits_{i=1}^n X_i} \onslide<+->{= \frac{1}{n^2}\sum\limits_{i=1}^n \V{X_i}} \onslide<+->{=\frac{1}{n^2}n\sigma^2=\frac{\sigma^2}{n}}\\
+\onslide<+->{SD(\ol{X}) &= \frac{\sigma}{\sqrt{n}}}
+\end{align*}
+
+## full distribution of $\ol{X}$ when sample is normal
+
+For a sample $X_1,\ldots,X_n$ i.i.d. $N(\mu,\sigma)$ we have:
+
+$$\M{\sum\limits_{i=1}^n X_i}(t) = \onslide<+->{\prod\limits_{i=1}^n\M{X_i}(t)} \onslide<+->{=\left(e^{\mu t + \sigma^2t^2/2}\right)^n} \onslide<+->{=e^{n\mu t + n\sigma^2t^2/2}}$$
+\pause so that $\sum\limits_{i=1}^n X_i \sim N\left(n\mu, \sqrt{n}\sigma\right)$
+
+\pause Using the rules for normal distributions we also get:
+$$\onslide<+->{\ol{X} \sim N\left(\mu, \frac{\sigma}{\sqrt{n}}\right)}
+\onslide<+->{\qquad\qquad \frac{\ol{X} - \mu}{\sigma/\sqrt{n}} \sim N(0,1)}$$
+
+\pause The seemingly impossible task is to determine the distribution of $\ol{X}$ when the underlying distribution is not normal (i.e., almost always.)
+
+## the actual central limit theorem
+
+For any random variable $X$ with mean $\mu$ and variance $\sigma^2$, consider a sample $X_1,\ldots,X_n$ from the same distribution. 
+
+Now consider the sample average of this sample: $\ol{X}_n$ (because $n$ will be changing below...). 
+
+\pause The actual Central Limit Theorem (CLT) says:
+\begin{align*}
+\onslide<3->{\lim_{n\to\infty}} \onslide<2->{\P{\frac{\ol{X}_n - \mu}{\sigma/\sqrt{n}} \le u}} \onslide<4->{&= P(Z \le u)}\\
+\onslide<5->{\lim_{n\to\infty} F_n(u) &= F_Z(u)}
+\end{align*}
+\pause \pause where $Z \sim N(0,1)$.
+
+## the value of the CLT is in the speed of convergence
+
+Useful limit theorems are ones where the convergence is fast---the CLT is such an example.
+
+$$\P{\frac{\ol{X} - \mu}{\sigma/\sqrt{n}} \le u} \approx P(Z \le u)$$
+for $n$ "large enough".
+
+\pause How large? Depends on the shape of the underlying distribution $X$.
+
+* $n=2$ would need $X$ normal.
+* $n=10$ good enough for symmetric distributions without outliers.
+* $n=30$ for mildly skewed $X$.
+* $n>60$ for more skewed.
+
+## how large is large enough case I - symmetric/no outliers
+
+Consider a Uniform[0,1] distribution. The mean is 0.5 and the standard deviation is $1/\sqrt{12}$. Here is a plot of a uniform density versus a $N(0.5, 1/\sqrt{12})$ density:
+
+```{r}
+x <- -50:150/100
+plot(x, dnorm(x, 0.5, 1/sqrt(12)), type="l", col="blue", ylab="density", cex=1.5)
+lines(x, dunif(x), col="red")
+legend(1, 1.4, legend = c("Normal", "Uniform"), fill=c("blue", "red"), )
+```
+
+## how large is large enough case I - symmetric/no outliers
+
+Now consider $X_1, X_2$ i.i.d. Uniform[0,1], and its sample average $\ol{X}$, which will have mean 0.5 and standard deviation $1/\sqrt{12\cdot 2}$.
+
+Here is a picture of the density for $\frac{\ol{X} - 0.5}{(1/\sqrt{12\cdot 2})/\sqrt{2}}$, along with the density for $Z \sim N(0,1)$.
+
+```{r}
+source("bates.R")
+n <- 2
+plot((x-0.5)*sqrt(12*n), dnorm((x-0.5)*sqrt(12*n)), type="l", col="blue", ylab="density", cex=1.5, xlab="x")
+lines((x-0.5)*sqrt(12*n), dbates(x, 2)/sqrt(12*n), col="red")
+legend(2, 0.4, legend = c("Normal", "Uniform X-bar standardized"), fill=c("blue", "red"), )
+```
+
+## how large is large enough case I - symmetric/no outliers
+
+Same as before but now with $X_1,X_2,X_3,X_4,X_5$ (i.e. $n=5$):
+
+```{r}
+n <- 5
+plot((x-0.5)/sqrt(12*n), dnorm((x-0.5)*sqrt(12*n)), type="l", col="blue", ylab="density", cex=1.5, xlab="x", xaxt='n')
+lines((x-0.5)/sqrt(12*n), dbates(x, n)/sqrt(12*n), col="red")
+legend(2, 0.4, legend = c("Normal", "Uniform X-bar standardized"), fill=c("blue", "red") )
+```
+
+## how large is large enough case I - symmetric/no outliers
+
+Now with $n=10$.
+
+```{r}
+n <- 10
+plot((x-0.5)/sqrt(12*n), dnorm((x-0.5)*sqrt(12*n)), type="l", col="blue", ylab="density", cex=1.5, xlab="x", xaxt='n')
+lines((x-0.5)/sqrt(12*n), dbates(x, n)/sqrt(12*n), col="red")
+legend(2, 0.4, legend = c("Normal", "Uniform X-bar standardized"), fill=c("blue", "red") )
+```
+
+## how large is large enough case II - skewed
+
+Now let the "underlying" distribution be Exp$(1)$, which has mean and standard deviation both equal to $1/1=1$. Here's the density along with a $N(1,1)$ density:
+
+```{r}
+x <- -50:600/100
+plot(x, dnorm(x, 1, 1), type="l", col="blue", ylab="density", cex=1.5, ylim=c(0,1.1))
+lines(x, dexp(x), col="red")
+legend(1, 1.4, legend = c("Normal", "Exp"), fill=c("blue", "red") )
+```
+
+## how large is large enough case II - skewed
+
+Now consider $X_1, X_2$ i.i.d. Exp(1), and its sample average $\ol{X}$, which will have mean 1 and standard deviation $1/\sqrt{2}$.
+
+Here is a picture of the density for $\frac{\ol{X} - 1}{1/\sqrt{2}}$, along with the density for $Z \sim N(0,1)$.
+
+```{r}
+x <- seq(0.1,6, by=0.1)
+n <- 2
+plot(x, dnorm(x, n, 1/sqrt(n)), type="l", xaxt='n', yaxt='n', col="blue", ylab="density")
+lines(x, dgamma(x, n, 1), col="red")
+legend(3.5, 0.4, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", "red") )
+```
+
+## how large is large enough case II - skewed
+
+Now with $n=10$.
+
+```{r}
+x <- seq(0, 21, by=0.1)
+n <- 10
+plot(x, dnorm(x, n, sqrt(n)), type="l", xaxt='n', yaxt='n', col="blue", ylab="density")
+lines(x, dgamma(x, n, 1), col="red")
+legend(13, 0.12, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", "red") )
+```
+
+
+## how large is large enough case II - skewed
+
+Try $n=60$
+
+```{r}
+x <- seq(20, 100, by=0.1)
+n <- 60
+plot(x, dnorm(x, n, sqrt(n)), type="l", xaxt='n', yaxt='n', col="blue", ylab="density")
+lines(x, dgamma(x, n, 1), col="red")
+legend(70, 0.05, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", "red") )
+```
+
+## normal approximation applications
+
+Given $X_1,\ldots,X_n$ i.i.d with mean $\mu$ and variance $\sigma^2$, as long as $n$ is large enough, any of the following approximations hold. Pick the most convenient:
+
+$$\sum\limits_{i=1}^n X_i \sim^{approx} N(n\mu, \sqrt{n}\sigma)$$
+
+$$\ol{X} \sim^{approx} N\left(\mu, \frac{\sigma}{\sqrt{n}}\right)$$
+
+$$\frac{\ol{X} - \mu}{\sigma/\sqrt{n}} \sim^{approx} N(0,1)$$
+
+## normal approximation example
+
+Piston lifetimes in a Diesel engine follow a roughly symmetric distribution with mean 3.4 years and standard deviation 2.1 years.
+
+What is the chance that the average life of 25 engines exceeds 4 years?
+
+$$\onslide<+->{P(\ol{X} > 4)} \onslide<+->{= \P{\frac{\ol{X} - 3.4}{2.1/\sqrt{25}} > \frac{4-3.4}{2.1/\sqrt{25}}}} \onslide<+->{\approx P(Z > 1.43)} \onslide<+->{= `r 1-pnorm(1.43)`}$$
+
+## another normal approximation example
+
+A defective item is produced with probability $p=0.01$. After $n=10000$ items are produced, what is the probability that there were fewer than 80 defective items produced?
+
+\pause If $X_i$ is 0 or 1 as item $i$ is not defective, or defective, respectively, then $X_i\sim\text{Bernoulli}(0.01)$. We want $P\left(\sum\limits_{i=1}^n X_i < 80\right)$.
+
+\pause In principle this is a Binomial$(n,p)$ calculation, but a very difficult one.
