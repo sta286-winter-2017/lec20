@@ -80,13 +80,13 @@ for $n$ "large enough".
 
 ## how large is large enough case I - symmetric/no outliers
 
-Consider a Uniform[0,1] distribution. The mean is 0.5 and the standard deviation is $1/\sqrt{12}$. Here is a plot of a uniform density versus a $N(0.5, 1/\sqrt{12})$ density:
+Consider a Uniform[0,1] distribution. The mean is 0.5 and the standard deviation is $1/\sqrt{12}$. Here is a plot of a *standardized* uniform density versus a $N(0,1)$ density:
 
 ```{r}
-x <- -50:150/100
-plot(x, dnorm(x, 0.5, 1/sqrt(12)), type="l", col="blue", ylab="density", cex=1.5)
-lines(x, dunif(x), col="red")
-legend(1, 1.4, legend = c("Normal", "Uniform"), fill=c("blue", "red"), )
+z <- -40:40/10
+plot(z, dnorm(z), type="l", col="blue", ylab="density", cex=1.5)
+lines(z, dunif(z/sqrt(12)+0.5)/sqrt(12), col="red")
+legend(2, 0.35, legend = c("Normal", "Uniform Std."), fill=c("blue", "red"), )
 ```
 
 ## how large is large enough case I - symmetric/no outliers
@@ -98,9 +98,9 @@ Here is a picture of the density for $\frac{\ol{X} - 0.5}{(1/\sqrt{12\cdot 2})/\
 ```{r}
 source("bates.R")
 n <- 2
-plot((x-0.5)*sqrt(12*n), dnorm((x-0.5)*sqrt(12*n)), type="l", col="blue", ylab="density", cex=1.5, xlab="x")
-lines((x-0.5)*sqrt(12*n), dbates(x, 2)/sqrt(12*n), col="red")
-legend(2, 0.4, legend = c("Normal", "Uniform X-bar standardized"), fill=c("blue", "red"), )
+plot(z, dnorm(z), type="l", col="blue", ylab="density", cex=1.5)
+lines(z, dbates(z/sqrt(12*n)+0.5, 2)/sqrt(12*n), col="red")
+legend(1, 0.35, legend = c("Normal", "Uniform X-Bar Std."), fill=c("blue", "red"))
 ```
 
 ## how large is large enough case I - symmetric/no outliers
@@ -109,9 +109,9 @@ Same as before but now with $X_1,X_2,X_3,X_4,X_5$ (i.e. $n=5$):
 
 ```{r}
 n <- 5
-plot((x-0.5)/sqrt(12*n), dnorm((x-0.5)*sqrt(12*n)), type="l", col="blue", ylab="density", cex=1.5, xlab="x", xaxt='n')
-lines((x-0.5)/sqrt(12*n), dbates(x, n)/sqrt(12*n), col="red")
-legend(2, 0.4, legend = c("Normal", "Uniform X-bar standardized"), fill=c("blue", "red") )
+plot(z, dnorm(z), type="l", col="blue", ylab="density", cex=1.5)
+lines(z, dbates(z/sqrt(12*n)+0.5, n)/sqrt(12*n), col="red")
+legend(1, 0.35, legend = c("Normal", "Uniform X-Bar Std."), fill=c("blue", "red"))
 ```
 
 ## how large is large enough case I - symmetric/no outliers
@@ -120,20 +120,20 @@ Now with $n=10$.
 
 ```{r}
 n <- 10
-plot((x-0.5)/sqrt(12*n), dnorm((x-0.5)*sqrt(12*n)), type="l", col="blue", ylab="density", cex=1.5, xlab="x", xaxt='n')
-lines((x-0.5)/sqrt(12*n), dbates(x, n)/sqrt(12*n), col="red")
-legend(2, 0.4, legend = c("Normal", "Uniform X-bar standardized"), fill=c("blue", "red") )
+plot(z, dnorm(z), type="l", col="blue", ylab="density", cex=1.5)
+lines(z, dbates(z/sqrt(12*n)+0.5, n)/sqrt(12*n), col="red")
+legend(1, 0.35, legend = c("Normal", "Uniform X-Bar Std."), fill=c("blue", "red"))
 ```
 
 ## how large is large enough case II - skewed
 
-Now let the "underlying" distribution be Exp$(1)$, which has mean and standard deviation both equal to $1/1=1$. Here's the density along with a $N(1,1)$ density:
+Now let the "underlying" distribution be Exp$(1)$, which has mean and standard deviation both equal to $1/1=1$. Here's the standardized density along with a $N(0,1)$ density:
 
 ```{r}
-x <- -50:600/100
-plot(x, dnorm(x, 1, 1), type="l", col="blue", ylab="density", cex=1.5, ylim=c(0,1.1))
-lines(x, dexp(x), col="red")
-legend(1, 1.4, legend = c("Normal", "Exp"), fill=c("blue", "red") )
+n <- 1
+plot(z, dnorm(z), type="l", col="blue", ylab="density", cex=1.5, ylim=c(0,1.1))
+lines(z, dexp(z/sqrt(n) + 1)/sqrt(n), col="red")
+legend(1, 0.75, legend = c("Normal", "Exp Std."), fill=c("blue", "red") )
 ```
 
 ## how large is large enough case II - skewed
@@ -143,11 +143,10 @@ Now consider $X_1, X_2$ i.i.d. Exp(1), and its sample average $\ol{X}$, which wi
 Here is a picture of the density for $\frac{\ol{X} - 1}{1/\sqrt{2}}$, along with the density for $Z \sim N(0,1)$.
 
 ```{r}
-x <- seq(0.1,6, by=0.1)
 n <- 2
-plot(x, dnorm(x, n, 1/sqrt(n)), type="l", xaxt='n', yaxt='n', col="blue", ylab="density")
-lines(x, dgamma(x, n, 1), col="red")
-legend(3.5, 0.4, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", "red") )
+plot(z, dnorm(z), type="l", col="blue", ylab="density")
+lines(z, dgamma(z/sqrt(n)+1, n, n)/sqrt(n), col="red")
+legend(1, 0.4, legend = c("Normal", "Exp X-Bar Std."), fill=c("blue", "red") )
 ```
 
 ## how large is large enough case II - skewed
@@ -155,11 +154,10 @@ legend(3.5, 0.4, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", 
 Now with $n=10$.
 
 ```{r}
-x <- seq(0, 21, by=0.1)
 n <- 10
-plot(x, dnorm(x, n, sqrt(n)), type="l", xaxt='n', yaxt='n', col="blue", ylab="density")
-lines(x, dgamma(x, n, 1), col="red")
-legend(13, 0.12, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", "red") )
+plot(z, dnorm(z), type="l", col="blue", ylab="density")
+lines(z, dgamma(z/sqrt(n)+1, n, n)/sqrt(n), col="red")
+legend(1, 0.4, legend = c("Normal", "Exp X-Bar Std."), fill=c("blue", "red") )
 ```
 
 
@@ -168,11 +166,21 @@ legend(13, 0.12, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", 
 Try $n=60$
 
 ```{r}
-x <- seq(20, 100, by=0.1)
 n <- 60
-plot(x, dnorm(x, n, sqrt(n)), type="l", xaxt='n', yaxt='n', col="blue", ylab="density")
-lines(x, dgamma(x, n, 1), col="red")
-legend(70, 0.05, legend = c("Normal", "Exp X-bar standardized"), fill=c("blue", "red") )
+plot(z, dnorm(z), type="l", col="blue", ylab="density")
+lines(z, dgamma(z/sqrt(n)+1, n, n)/sqrt(n), col="red")
+legend(1, 0.4, legend = c("Normal", "Exp X-Bar Std."), fill=c("blue", "red") )
+```
+
+## how large is large enough case II - skewed
+
+Try $n=200$
+
+```{r}
+n <- 200
+plot(z, dnorm(z), type="l", col="blue", ylab="density")
+lines(z, dgamma(z/sqrt(n)+1, n, n)/sqrt(n), col="red")
+legend(1, 0.4, legend = c("Normal", "Exp X-Bar Std."), fill=c("blue", "red") )
 ```
 
 ## normal approximation applications
@@ -200,3 +208,13 @@ A defective item is produced with probability $p=0.01$. After $n=10000$ items ar
 \pause If $X_i$ is 0 or 1 as item $i$ is not defective, or defective, respectively, then $X_i\sim\text{Bernoulli}(0.01)$. We want $P\left(\sum\limits_{i=1}^n X_i < 80\right)$.
 
 \pause In principle this is a Binomial$(n,p)$ calculation, but a very difficult one.
+
+\pause Using the normal approx. to sum of Bernoulli$(p)$ is straightforward:
+$$\sum\limits_{i=1}^n X_i \sim^{approx} N(n\mu, \sqrt{n}\sigma)$$
+
+\pause In this case $n=10000$, $\mu = p$, and $\sigma^2=p(1-p)$. So:
+$$\sum\limits_{i=1}^n X_i \sim^{approx} N(100, \sqrt{99})$$
+
+\pause and
+$$P\left(\sum\limits_{i=1}^n X_i < 80\right) \approx P\left(Z < \frac{80-100}{\sqrt{99}}\right) = P(Z < -2.01) = 0.022$$
+
